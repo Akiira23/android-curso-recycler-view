@@ -1,9 +1,10 @@
 package br.com.alura.ceep.ui.activity;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
-import android.widget.ListView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ import br.com.alura.ceep.R;
 import br.com.alura.ceep.dao.NotaDAO;
 import br.com.alura.ceep.model.Nota;
 import br.com.alura.ceep.ui.adapter.ListaNotasAdapter;
+import br.com.alura.ceep.ui.recyclerview.adapter.ListasNotasAdapter;
 
 public class ListaNotasActivity extends AppCompatActivity {
 
@@ -19,7 +21,7 @@ public class ListaNotasActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lista_notas);
 
-        ListView listaNotas = findViewById(R.id.listView);
+        RecyclerView listaNotas = findViewById(R.id.lista_notas_recyclerview);
         NotaDAO dao = new NotaDAO();
 
         for (int i = 1; i <= 10000; i++) {
@@ -27,6 +29,8 @@ public class ListaNotasActivity extends AppCompatActivity {
         }
         List<Nota> todasNotas = dao.todos();
 
-        listaNotas.setAdapter(new ListaNotasAdapter(this, todasNotas));
+        listaNotas.setAdapter(new ListasNotasAdapter(this, todasNotas));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        listaNotas.setLayoutManager(layoutManager);
     }
 }
