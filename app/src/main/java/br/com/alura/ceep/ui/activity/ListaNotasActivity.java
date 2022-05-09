@@ -31,6 +31,7 @@ import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.REQUEST_CODE_
 public class ListaNotasActivity extends AppCompatActivity {
 
 
+    public static final String TITULO_APPBAR = "Notas";
     private ListasNotasAdapter adapter;
 
 
@@ -38,6 +39,8 @@ public class ListaNotasActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lista_notas);
+        setTitle(TITULO_APPBAR);
+
         List<Nota> todasNotas = pegaTodasNotas();
 
         botaoInsereNota();
@@ -63,9 +66,6 @@ public class ListaNotasActivity extends AppCompatActivity {
 
     private List<Nota> pegaTodasNotas() {
         NotaDAO dao = new NotaDAO();
-        for (int i = 0; i < 10; i++) {
-            dao.insere(new Nota("Título " + (i + 1), "Descrição " + (i + 1)));
-        }
         return dao.todos();
     }
 
@@ -121,10 +121,6 @@ public class ListaNotasActivity extends AppCompatActivity {
                 if (ehPosicaoValida(posicaoRecebida)) {
                     altera(notaRecebida, posicaoRecebida);
                 }
-            } else {
-                Toast.makeText(this,
-                        "Ocorreu um problema na alteração da nota",
-                        Toast.LENGTH_SHORT).show();
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -157,7 +153,7 @@ public class ListaNotasActivity extends AppCompatActivity {
     }
 
     private boolean temNota(@Nullable Intent data) {
-        return data.hasExtra(CHAVE_NOTA);
+        return data != null && data.hasExtra(CHAVE_NOTA);
     }
 
     private boolean resultadoOk(int resultCode) {
