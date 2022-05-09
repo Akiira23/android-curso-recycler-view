@@ -14,10 +14,10 @@ import java.util.List;
 import br.com.alura.ceep.R;
 import br.com.alura.ceep.model.Nota;
 
-public class ListasNotasAdapter extends RecyclerView.Adapter {
+public class ListasNotasAdapter extends RecyclerView.Adapter<ListasNotasAdapter.NotaViewHolder> {
 
-    private List<Nota> notas;
-    private Context context;
+    private final List<Nota> notas;
+    private final Context context;
 
     public ListasNotasAdapter(Context context, List<Nota> notas) {
         this.context = context;
@@ -26,31 +26,41 @@ public class ListasNotasAdapter extends RecyclerView.Adapter {
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ListasNotasAdapter.NotaViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View viewCriada = LayoutInflater.from(context)
                 .inflate(R.layout.item_nota, parent, false);
         return new NotaViewHolder(viewCriada);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ListasNotasAdapter.NotaViewHolder holder, int position) {
         Nota nota = notas.get(position);
 
-        TextView titulo = holder.itemView.findViewById(R.id.item_nota_titulo);
-        titulo.setText(nota.getTitulo());
-
-        TextView descricao = holder.itemView.findViewById(R.id.item_nota_descricao);
-        descricao.setText(nota.getDescricao());
+        holder.vincula(nota);
     }
 
     @Override
     public int getItemCount() {
         return notas.size();
     }
+
     class NotaViewHolder extends RecyclerView.ViewHolder {
+        private final TextView titulo;
+        private final TextView descricao;
 
         public NotaViewHolder(@NonNull View itemView) {
             super(itemView);
+            titulo = itemView.findViewById(R.id.item_nota_titulo);
+            descricao = itemView.findViewById(R.id.item_nota_descricao);
+        }
+
+        public void vincula(Nota nota) {
+            preencheCampos(nota);
+        }
+
+        private void preencheCampos(Nota nota) {
+            titulo.setText(nota.getTitulo());
+            descricao.setText(nota.getDescricao());
         }
     }
 }

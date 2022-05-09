@@ -11,7 +11,6 @@ import java.util.List;
 import br.com.alura.ceep.R;
 import br.com.alura.ceep.dao.NotaDAO;
 import br.com.alura.ceep.model.Nota;
-import br.com.alura.ceep.ui.adapter.ListaNotasAdapter;
 import br.com.alura.ceep.ui.recyclerview.adapter.ListasNotasAdapter;
 
 public class ListaNotasActivity extends AppCompatActivity {
@@ -21,16 +20,31 @@ public class ListaNotasActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lista_notas);
 
-        RecyclerView listaNotas = findViewById(R.id.lista_notas_recyclerview);
+        List<Nota> todasNotas = notasDeExemplo();
+        configuraRecyclerView(todasNotas);
+    }
+
+    private List<Nota> notasDeExemplo() {
         NotaDAO dao = new NotaDAO();
+        dao.insere(new Nota("Primeira nota ", "Descrição pequena."));
+        dao.insere(new Nota("Segunda nota ", "Segunda descrição " +
+                "é bem maior que a da primeira nota."));
 
-        for (int i = 1; i <= 10000; i++) {
-            dao.insere(new Nota("Título " + i, "Descrição " + i));
-        }
-        List<Nota> todasNotas = dao.todos();
+        return dao.todos();
+    }
 
-        listaNotas.setAdapter(new ListasNotasAdapter(this, todasNotas));
+    private void configuraRecyclerView(List<Nota> todasNotas) {
+        RecyclerView listaNotas = findViewById(R.id.lista_notas_recyclerview);
+        configuraAdapter(todasNotas, listaNotas);
+        // configuraLayoutManager(listaNotas); //configurado no xml "app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager""
+    }
+
+    private void configuraLayoutManager(RecyclerView listaNotas) {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         listaNotas.setLayoutManager(layoutManager);
+    }
+
+    private void configuraAdapter(List<Nota> todasNotas, RecyclerView listaNotas) {
+        listaNotas.setAdapter(new ListasNotasAdapter(this, todasNotas));
     }
 }
