@@ -13,15 +13,21 @@ import java.util.List;
 
 import br.com.alura.ceep.R;
 import br.com.alura.ceep.model.Nota;
+import br.com.alura.ceep.ui.recyclerview.adapter.listener.OnItemClickListener;
 
 public class ListasNotasAdapter extends RecyclerView.Adapter<ListasNotasAdapter.NotaViewHolder> {
 
     private final List<Nota> notas;
     private final Context context;
+    private OnItemClickListener onItemClickListener;
 
     public ListasNotasAdapter(Context context, List<Nota> notas) {
         this.context = context;
         this.notas = notas;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
     }
 
     @NonNull
@@ -35,7 +41,6 @@ public class ListasNotasAdapter extends RecyclerView.Adapter<ListasNotasAdapter.
     @Override
     public void onBindViewHolder(@NonNull ListasNotasAdapter.NotaViewHolder holder, int position) {
         Nota nota = notas.get(position);
-
         holder.vincula(nota);
     }
 
@@ -52,14 +57,22 @@ public class ListasNotasAdapter extends RecyclerView.Adapter<ListasNotasAdapter.
     class NotaViewHolder extends RecyclerView.ViewHolder {
         private final TextView titulo;
         private final TextView descricao;
+        private Nota nota;
 
         public NotaViewHolder(@NonNull View itemView) {
             super(itemView);
             titulo = itemView.findViewById(R.id.item_nota_titulo);
             descricao = itemView.findViewById(R.id.item_nota_descricao);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onItemClickListener.onItemClick(nota);
+                }
+            });
         }
 
         public void vincula(Nota nota) {
+            this.nota = nota;
             preencheCampos(nota);
         }
 
