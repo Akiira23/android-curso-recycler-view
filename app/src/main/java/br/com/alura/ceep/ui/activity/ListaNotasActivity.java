@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,43 +17,48 @@ import br.com.alura.ceep.dao.NotaDAO;
 import br.com.alura.ceep.model.Nota;
 import br.com.alura.ceep.ui.recyclerview.adapter.ListasNotasAdapter;
 
+import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.CHAVE_NOTA;
+import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.REQUEST_CODE_INSERE_NOTA;
+import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.RESULT_CODE_NOTA_CRIADA;
+
 public class ListaNotasActivity extends AppCompatActivity {
+
+
+    private ListasNotasAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lista_notas);
+        List<Nota> todasNotas = pegaTodasNotas();
 
+        botaoInsereNota();
+
+        configuraRecyclerView(todasNotas);
+    }
+
+    private void botaoInsereNota() {
         TextView botaoInsereNota = findViewById(R.id.lista_notas_insere_nota);
         botaoInsereNota.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent iniciaFormularioNota = new Intent(ListaNotasActivity.this,
-                        FormularioNotaActivity.class);
-                startActivity(iniciaFormularioNota);
+                vaiParaFormularioNotaActivity();
             }
         });
-
-        List<Nota> todasNotas = notasDeExemplo();
-        configuraRecyclerView(todasNotas);
     }
 
-    @Override
-    protected void onResume() {
-        NotaDAO dao = new NotaDAO();
-        List<Nota> todasNotas = dao.todos();
-        configuraRecyclerView(todasNotas);
-        super.onResume();
+    private void vaiParaFormularioNotaActivity() {
+        Intent iniciaFormularioNota = new Intent(ListaNotasActivity.this,
+                FormularioNotaActivity.class);
+        startActivityForResult(iniciaFormularioNota, REQUEST_CODE_INSERE_NOTA);
     }
 
-    private List<Nota> notasDeExemplo() {
+    private List<Nota> pegaTodasNotas() {
         NotaDAO dao = new NotaDAO();
-        dao.insere(new Nota("Primeira nota ", "Descrição pequena."));
-        dao.insere(new Nota("Segunda nota ", "Segunda descrição " +
-                "é bem maior que a da primeira nota."));
-
         return dao.todos();
     }
+
 
     private void configuraRecyclerView(List<Nota> todasNotas) {
         RecyclerView listaNotas = findViewById(R.id.lista_notas_recyclerview);
@@ -66,6 +72,39 @@ public class ListaNotasActivity extends AppCompatActivity {
     }
 
     private void configuraAdapter(List<Nota> todasNotas, RecyclerView listaNotas) {
-        listaNotas.setAdapter(new ListasNotasAdapter(this, todasNotas));
+        adapter = new ListasNotasAdapter(this, todasNotas);
+        listaNotas.setAdapter(adapter);
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (ehResultadoComNota(requestCode, resultCode, data)) {
+            Nota notaRecebida = (Nota) data.getSerializableExtra(CHAVE_NOTA);
+            adiciona(notaRecebida);
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void adiciona(Nota nota) {
+        new NotaDAO().insere(nota);
+        adapter.adiciona(nota);
+    }
+
+    private boolean ehResultadoComNota(int requestCode, int resultCode, @Nullable Intent data) {
+        return ehCodigoRequisicaoInsereNota(requestCode) &&
+                ehCodigoResultadoNotaCriada(resultCode) && temNota(data);
+    }
+
+    private boolean temNota(@Nullable Intent data) {
+        return data.hasExtra(CHAVE_NOTA);
+    }
+
+    private boolean ehCodigoResultadoNotaCriada(int resultCode) {
+        return resultCode == RESULT_CODE_NOTA_CRIADA;
+    }
+
+    private boolean ehCodigoRequisicaoInsereNota(int requestCode) {
+        return requestCode == REQUEST_CODE_INSERE_NOTA;
+    }
+
 }
